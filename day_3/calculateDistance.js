@@ -20,11 +20,10 @@ const generatePositions = moves => {
     .flat();
 };
 
+// Part 1
 const calculateDistance = (wire1, wire2) => {
   const path1 = generatePositions(wire1);
-  console.log(path1);
   const path2 = generatePositions(wire2);
-  console.log(path2);
 
   const closestPosition = path1
     .filter(position =>
@@ -34,8 +33,35 @@ const calculateDistance = (wire1, wire2) => {
     .sort((a, b) => a - b)[0];
 
   return closestPosition;
-
-  // return closestPosition.x + closestPosition.y;
 };
 
-module.exports = calculateDistance;
+const getIndexes = (intersections, path) => {
+  return intersections.map(intersection => {
+    return path.findIndex(
+      i => i.x === intersection.x && i.y === intersection.y
+    );
+  });
+};
+
+// Part 2
+const calculateSignalDelay = (wire1, wire2) => {
+  const path1 = generatePositions(wire1);
+  const path2 = generatePositions(wire2);
+
+  const intersections = path1.filter(position =>
+    path2.find(p => p.x === position.x && p.y === position.y)
+  );
+
+  const indexSet = [
+    getIndexes(intersections, path1),
+    getIndexes(intersections, path2)
+  ];
+
+  return intersections
+    .map((_, i) => {
+      return indexSet[0][i] + indexSet[1][i] + 2; // +2 accounts for 0 based index
+    })
+    .sort((a, b) => a - b)[0];
+};
+
+module.exports = { calculateDistance, calculateSignalDelay };
