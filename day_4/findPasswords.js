@@ -8,17 +8,32 @@ const doesPasswordMeetCriteria = password => {
 
   let hasSuccessiveDigits = false;
   let hasDecreased = false;
+  let groups = {};
 
   digitsArr.forEach((digit, i) => {
     if (i === 0) {
       return;
     }
+
+    if (digit === digitsArr[i - 1]) {
+      // add to set
+      const count = groups[digit] || 1;
+      groups[digit] = count + 1;
+    }
+
     hasSuccessiveDigits =
       digit === digitsArr[i - 1] ? true : hasSuccessiveDigits;
     hasDecreased = digit < digitsArr[i - 1] ? true : hasDecreased;
   });
 
-  return hasSuccessiveDigits && !hasDecreased;
+  const hasValidGroup = Object.values(groups).some(g => g === 2);
+
+  return (
+    hasSuccessiveDigits &&
+    !hasDecreased &&
+    hasValidGroup &&
+    digitsArr.length === 6
+  );
 };
 
 const findPasswords = ({ start, end }) => {
@@ -28,8 +43,10 @@ const findPasswords = ({ start, end }) => {
     if (doesPasswordMeetCriteria(passwordString)) {
       matchedPasswords.push(passwordString);
     }
+    // passwords.push(passwordString);
   }
 
+  console.log(matchedPasswords);
   return matchedPasswords;
 };
 
